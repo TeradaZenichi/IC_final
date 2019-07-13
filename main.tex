@@ -6,6 +6,9 @@
 \author{Lucas Zenichi Terada}
 \title{Reconfiguração das redes de distribuição de energia elétrica operando em diferentes níveis de demanda}
 \date{\today}
+\numberwithin{equation}{section}
+
+\usepackage{tikz,lipsum,lmodern}
 
 
 \begin{document}
@@ -13,6 +16,8 @@
 \makecover
 %\maketitle
 
+\input{0_Pretextual/0.0_Abstract.tex}
+\input{0_Pretextual/0.1_summaries.tex}
 \input{1_Introduction/1.0_Introduction.tex}
 \input{2_Objectives/2.0_Objectives.tex}
 \input{3_Methodology/3.0_Methodology.tex}
@@ -21,7 +26,10 @@
 \input{4_Modeling/4.2_Voltageconst.tex}
 \input{4_Modeling/4.3_Currentconst.tex}
 \input{4_Modeling/4.4_Operativeconst.tex}
-\input{4_Modeling/4.5_Linearization.tex}
+\input{5_Formulation/5.0_Formulationdescription.tex}
+\input{5_Formulation/5.1_Nonlinear.tex}
+\input{5_Formulation/5.2_Conicformulation.tex}
+\input{5_Formulation/5.3_Linearization.tex}
 \bibliographystyle{plain}               %Estilo de apresentação da bibliografia
 \bibliography{references,webpage} %Arquivos de referência para importação
 

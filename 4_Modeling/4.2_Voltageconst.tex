@@ -52,7 +52,12 @@ Usando a fórmula da trigonometria, que é a relação básica entre o seno e o 
 
 \begin{equation}
     V_{i}^{2} - 2(R_{ij}P_{ij} + X_{ij}Q_{ij}) - Z_{ij}^{2}I_{ij}^{2} - V_{j}^{2} = 0\quad\forall ij \in \Omega_{l}
-    \label{eq:queda_tensao_restricao}
 \end{equation}
 
-Nota-se que a equação \ref{eq:queda_tensao_restricao} não depende da diferença angular entre as tensões, e é possível obter a magnitude da tensão do nó ($V_j$) em termos da magnitude inicial ($V_i$), o fluxo de potência ativa ($P_{ij}$), o fluxo de potência reativa ($Q_{ij}$), a magnitude do fluxo de corrente ($I_{ij}$) e os parâmetros elétricos do ramo \textit{ij}.
+Realizando a mudança de variável, proposto em~\ref{eq:change_variable}:
+
+\begin{equation}\label{eq:queda_tensao_restricao}
+    V_{i}^{sqr} - 2(R_{ij}P_{ij} + X_{ij}Q_{ij}) - Z_{ij}^{2}I_{ij}^{2} - V_{j}^{sqr} = 0\quad\forall ij \in \Omega_{l}
+\end{equation}
+
+Nota-se que a equação \ref{eq:queda_tensao_restricao} não depende da diferença angular entre as tensões, e é possível obter a magnitude da tensão do nó ($V_j$) em termos da magnitude inicial ($V_i$), o fluxo de potência ativa ($P_{ij}$), o fluxo de potência reativa ($Q_{ij}$), a magnitude do fluxo de corrente ($I_{ij}$) e os parâmetros elétricos do ramo $ij$.

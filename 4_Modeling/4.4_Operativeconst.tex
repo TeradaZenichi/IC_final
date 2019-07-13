@@ -1,11 +1,6 @@
 \subsection{Restrições operativas do sistema}
 
-Como visto, as equações \ref{eq:fluxo_pot_ativa}, \ref{eq:fluxo_pot_reativa}, \ref{eq:queda_tensao_restricao} e \ref{eq:corrente_magnitude} são restrições cujas variáveis $V_{i}$ e $I_{ij}$ estão sempre na forma quadrática, por isso é possível fazer uma substituição de variáveis a fim de tornar mais simples o problema, tal que:
-
-\begin{align*}
-    I_{ij}^{sqr} = I_{ij}^{2} \text{ e } V_{i}^{sqr} = V_{i}^{2} 
-\end{align*}
-
+O problema de reconfiguração está sujeita a restrições operativas imposta pela agência reguladora, tais como limite de tensão, correntes tanto para o conjunto de ramos do sistema quanto para a operação das chaves.
 Dessa forma é possível determinar as restrições operativas para o funcionamento do SDEE.
 
 \subsubsection{Limites de tensão}
@@ -13,7 +8,7 @@ Dessa forma é possível determinar as restrições operativas para o funcioname
 Em um sistema de distribuição de energia elétrica é preciso garantir que a tensão em um nó esteja dentro de uma faixa de operação determinada por norma, por isso uma restrição fundamental para o problema é a restrição de limites de tensão em um nó, determinada pela seguinte equação:
 
 \begin{equation}
-    \underline{V}^{2} \leq V_{i}^{sqr} \leq \overline{V}^{2}\qquad i \in\Omega_{b}
+    \underline{V}^{2} \leq V_{i}^{sqr} \leq \overline{V}^{2}\qquad\forall i \in\Omega_{b}
 \end{equation}
 
 Onde $\underline{V}$ e $\overline{V}$ representam o limite inferior e superior de tensão, respectivamente, que uma rede pode possuir.
@@ -25,7 +20,7 @@ Assim como as tensões, o fluxo de corrente também deve ser limitado para não 
 Assim a equação que descreve a restrição é:
 
 \begin{equation}
-    0 \leq I_{ij}^{sqr} \leq \overline{I}_{ij}^{2} \qquad ij\in\Omega_{l} 
+    0 \leq I_{ij}^{sqr} \leq \overline{I}_{ij}^{2} \qquad\forall ij\in\Omega_{l} 
 \end{equation}
 
 \subsubsection{Chaves presentes no sistema}
@@ -43,7 +38,7 @@ Considere as seguintes restrições:
 \begin{itemize}
     \item Balanço de potência
 \end{itemize}
-    Com base na figura \ref{fig:diagrama_chave}, faz-se necessário reformular as equações de balanço de potência adicionando as variáveis que representam as chaves na modelagem do problema.
+    Com base na figura \ref{fig:diagrama_chave}, faz-se necessário reformular as equações de balanço de potência, expressas em~\ref{eq:fluxo_pot_ativa} e \ref{eq:fluxo_pot_reativa}, adicionando as variáveis que representam as chaves na modelagem do problema.
 
 \begin{equation}
     \sum_{ji\in\Omega_{l}}P_{ji} - \sum_{ij\in\Omega_{l}}(P_{ij} + R_{ij}I_{ij}^{sqr})+ \sum_{ji\in\Omega_{ch}}P_{ji}^{ch} -\sum_{ij\in\Omega_{ch}}P_{ij}^{ch} + P_{i}^{S} = P_{i}^{D}\quad\forall i \in\Omega_{b}\label{eq:fluxo_pot_ativa_chaves}  
@@ -70,7 +65,7 @@ A diferença de tensão entre nós, na presença de chaves, deve ser igual a zer
 Sendo assim, usando a variável binária $w_{ij}$ é possível equacionar a restrição da seguinte forma:
 
 \begin{equation}
-    -(\overline{V}^{2} - \underline{V}^{2})(1-w_{ij}) \leq V_{i}^{sqr} - V_{j}^{sqr} \leq (\overline{V}^{2} - \underline{V}^{2})(1-w_{ij})\qquad ij\in\Omega_{ch}        
+    -(\overline{V}^{2} - \underline{V}^{2})(1-w_{ij}) \leq V_{i}^{sqr} - V_{j}^{sqr} \leq (\overline{V}^{2} - \underline{V}^{2})(1-w_{ij})\qquad\forall ij\in\Omega_{ch}        
 \end{equation}
     
 É possível observar que se $w_{ij}$ for igual a 1 (chave fechada), a diferença entre as tensões no nó $i$ e nó $j$ será igual a zero, o que condiz a hipótese adotada.
@@ -82,12 +77,12 @@ Sendo assim, usando a variável binária $w_{ij}$ é possível equacionar a rest
 O fluxo de potência na chave é determinada pelas equações abaixo.
     
 \begin{equation}
-    -(\overline{V}\,\overline{I}_{ij}^{ch})w_{ij} \leq P_{ij}^{ch} \leq (\overline{V}\,\overline{I}_{ij}^{ch})w_{ij}\qquad ij\in\Omega_{ch}   
+    -(\overline{V}\,\overline{I}_{ij}^{ch})w_{ij} \leq P_{ij}^{ch} \leq (\overline{V}\,\overline{I}_{ij}^{ch})w_{ij}\qquad\forall ij\in\Omega_{ch}   
 \end{equation}
     
     
 \begin{equation}
-    -(\overline{V}\,\overline{I}_{ij}^{ch})w_{ij} \leq Q_{ij}^{ch} \leq (\overline{V}\,\overline{I}_{ij}^{ch})w_{ij}\qquad ij\in\Omega_{ch}   
+    -(\overline{V}\,\overline{I}_{ij}^{ch})w_{ij} \leq Q_{ij}^{ch} \leq (\overline{V}\,\overline{I}_{ij}^{ch})w_{ij}\qquad\forall ij\in\Omega_{ch}   
 \end{equation}
     
 É possível notar que se a variável $w_{ij}$ for igual a 0 (chave aberta), o fluxo de potência na chave é igual a zero, o que condiz com a proposta do elemento de circuito na rede; quando igual a 1, as restrições representam o fluxo máximo de potência ativa e reativa permitida na chave quando está energizada.

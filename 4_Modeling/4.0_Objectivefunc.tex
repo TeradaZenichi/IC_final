@@ -1,5 +1,15 @@
 \section{Modelagem do problema}
 
+O problema de RSD envolve restrições não lineares e variáveis quadráticas, a fim de, em um primeiro momento, realizar uma tentativa de linearização e simplificação do problema, propõe-se uma mudança de variável que será aplicado nas equações ao longo deste documento.
+
+\begin{align}
+    I_{ij}^{sqr} = I_{ij}^{2}\;\forall ij \in \Omega_l \text{ e } V_{i}^{sqr} = V_{i}^{2}\; \forall i\in\Omega_b 
+    \label{eq:change_variable}
+\end{align}
+
+%Explicar o significado de conjunto de circuitos e conjunto de nós do sistema
+
+
 \subsection{Função objetivo}
 
 Dado o modelo de otimização a ser interpretado pela linguagem de modelagem, é possível definir a função objetivo com base na figura~\ref{fig:SDR}.
@@ -8,7 +18,11 @@ A fim de reduzir as perdas ôhmicas na rede elétrica, a função objetivo do pr
 Definindo $c^{lss}$ como parâmetro que representa o custo das perdas de potência ativa na rede têm-se:
 
 \begin{equation}
-    \text{Min} = c^{lss}\sum_{ij\in\Omega_{l}}R_{ij}I_{ij}^{2}
+    \begin{split}
+        \text{Min} = & c^{lss}\sum_{ij\in\Omega_{l}}R_{ij}I_{ij}^{2}\\
+        = & c^{lss}\sum_{ij\in\Omega_{l}}R_{ij}I_{ij}^{sqr}
+    \end{split}
+    \label{eq:funcobjetivo}
 \end{equation}
 
 Tal que $\Omega_{l}$ é o conjunto de circuitos do sistema.

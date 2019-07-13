@@ -1,0 +1,60 @@
+\subsection{Problema de programação não linear}
+
+Utilizando a metodologia descrita anteriormente, é possível modelar o problema de reconfiguração de redes radiais, utilizando as equações~\ref{eq:funcobjetivo}, \ref{eq:fluxo_pot_ativa_chaves}, \ref{eq:fluxo_pot_reativa_chaves}, \ref{eq:corrente_ramo} da seguinte forma:
+
+
+\begin{tcolorbox}[enhanced jigsaw,breakable,pad at break*=1mm,colback=white!10,title =\textbf{Problema de PLIM para RSD}]
+
+\begin{align*}\label{eq:NL_funcobj}
+    \text{Min}\quad c^{lss}\sum_{ij\in\Omega_l}R_{ij}I_{ij}^{sqr}
+\end{align*}
+
+Sujeito a:
+
+\begin{equation*}\label{eq:NL_PA}
+    \sum_{ji\in\Omega_{l}}P_{ji} - \sum_{ij\in\Omega_{l}}(P_{ij} + R_{ij}I_{ij}^{sqr})+ \sum_{ji\in\Omega_{ch}}P_{ji}^{ch} -\sum_{ij\in\Omega_{ch}}P_{ij}^{ch} + P_{i}^{S} = P_{i}^{D}\quad\forall i \in\Omega_{b}  
+\end{equation*}
+
+\begin{equation*}\label{eq:NL_PR}
+    \sum_{ji\in\Omega_{l}}Q_{ji} - \sum_{ij\in\Omega_{l}}(Q_{ij} + X_{ij}I_{ij}^{sqr})+ \sum_{ji\in\Omega_{ch}}Q_{ji}^{ch} -\sum_{ij\in\Omega_{ch}}Q_{ij}^{ch} + Q_{i}^{S} = Q_{i}^{D}\quad\forall i \in\Omega_{b}
+\end{equation*}
+
+\begin{equation*}\label{eq:NL_voltage}
+    V_{i}^{sqr} - 2(R_{ij}P_{ij} + X_{ij}Q_{ij}) - Z_{ij}^{2}I_{ij}^{sqr} - V_{j}^{sqr} = 0\quad\forall ij \in \Omega_{l}
+\end{equation*}
+
+\begin{equation*}\label{eq:NL_power}
+    V_{j}^{sqr}I_{ij}^{sqr} = P_{ij}^{2}+Q_{ij}^{2}\quad\forall ij \in \Omega_{l}
+\end{equation*}
+
+\begin{equation*}\label{eq:NL_voltagekeys}
+    -(\overline{V}^{2} - \underline{V}^{2})(1-w_{ij}) \leq V_{i}^{sqr} - V_{j}^{sqr} \leq (\overline{V}^{2} - \underline{V}^{2})(1-w_{ij})\qquad\forall ij\in\Omega_{ch}
+\end{equation*}
+    
+\begin{equation*}\label{eq:NL_PAkeys}
+    -(\overline{V}\,\overline{I}_{ij}^{ch})w_{ij} \leq P_{ij}^{ch} \leq (\overline{V}\,\overline{I}_{ij}^{ch})w_{ij}\qquad\forall ij\in\Omega_{ch}
+\end{equation*}
+    
+    
+\begin{equation*}\label{eq:NL_PRkeys}
+    -(\overline{V}\,\overline{I}_{ij}^{ch})w_{ij} \leq Q_{ij}^{ch} \leq (\overline{V}\,\overline{I}_{ij}^{ch})w_{ij}\qquad\forall ij\in\Omega_{ch}   
+\end{equation*}
+    
+\begin{equation*}\label{eq:NL_radialidade}
+    |\Omega_{l}| + \sum_{ij\in\Omega_{ch}}w_{ij} = |\Omega_{b}| - 1
+\end{equation*}
+
+\begin{equation*}\label{eq:NL_limvoltage}
+    \underline{V}^{2} \leq V_{i}^{sqr} \leq \overline{V}^{2}\qquad\forall i \in\Omega_{b}
+\end{equation*}
+
+\begin{equation*}\label{eq:NL_limcurrent}
+    0 \leq I_{ij}^{sqr} \leq \overline{I}_{ij}^{2} \qquad\forall ij\in\Omega_{l} 
+\end{equation*}
+
+\begin{equation*}\label{eq:NL_binario}
+    w_{ij}\quad\text{binário}\qquad\forall ij \in\Omega_{ch}
+\end{equation*}
+\end{tcolorbox}
+
+O problema descrito no conjunto equações destacadas é considerado um problema de programação não linear devido à presença da restrição expressa na equação~\ref{eq:NL_power}, uma vez que ela é o produto de duas variáveis que representam tensão e corrente do sistema ($V_{j}^{sqr}$ e $I_{ij}^{sqr}$) que são iguais a soma dos quadrados das variáveis que representam as potências ativas e reativas do sistema ($P_{ij}$ e $Q_{ij}$).
