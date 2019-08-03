@@ -13,6 +13,11 @@
 \RequirePackage{xcolor}     %Package to add colors
 %%%New%%%
 \RequirePackage{nomencl}    %Package to create nomenclature list
+\RequirePackage{amsfonts}
+\RequirePackage{siunitx}
+\RequirePackage{listings}
+\RequirePackage{verbatim}
+
 
 %-------------------------------------------------
 %                required packages
@@ -81,8 +86,111 @@
     Orientador: \@supervisor
     \null \vfill
     \begin{center}
+        Campinas
         \@date
     \end{center}
 \end{titlepage}}
 
+\newcommand{\makecoversheet}{%
+
+\begin{center}
+{\large Universidade Estadual de Campinas
+
+Faculdade de Engenharia Elétrica e de Computação}
+\end{center}
+
+\vspace*{1.0cm}
+\begin{center}
+\large \@author 
+\end{center}
+
+    
+\vspace*{1.3cm}
+    
+\begin{center}
+    {\sc \@title}
+\end{center}
+    
+\vspace*{0.5cm}
+
+    
+\vspace*{1.0cm}
+    
+\begin{flushright}
+\begin{minipage}{11.0cm}
+Projeto de iniciação científica em parceria com a Fundação de Amparo à Pesquisa do Estado de São Paulo. Realizado na Faculdade de Engenharia Elétrica e de Computação da UNICAMP no nível de graduação.
+    
+\vspace*{0.5cm}
+    
+\vspace*{1.0cm}
+Orientador: \@supervisor
+    
+\end{minipage}
+\end{flushright}
+    
+\null \vfill
+\begin{minipage}{7cm}
+\small
+Este exemplar corresponde ao relatório final do projeto de iniciação científica.    
+\rule{6.9cm}{0.2mm} \hfill 
+\end{minipage}
+    
+\null \vfill
+\begin{center}
+    Campinas\\2019
+\end{center}
+\thispagestyle{empty}
+\clearpage
+
+}
+
 \makeatother
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+ 
+% \lstdefinestyle{mystyle}{
+%     backgroundcolor=\color{white},   
+%     commentstyle=\color{codegreen},
+%     keywordstyle=\color{magenta},
+%     numberstyle=\tiny\color{codegray},
+%     stringstyle=\color{codepurple},
+%     basicstyle=\footnotesize,
+%     breakatwhitespace=false,         
+%     breaklines=true,                 
+%     captionpos=b,                    
+%     keepspaces=true,                 
+%     numbers=left,                    
+%     numbersep=-0.9cm,                  
+%     showspaces=false,                
+%     showstringspaces=false,
+%     showtabs=true,                  
+%     tabsize=2
+% }
+
+\lstdefinelanguage{Julia}%
+  {morekeywords={abstract,break,case,catch,const,continue,do,else,elseif,%
+      end,export,false,for,function,immutable,import,importall,if,in,%
+      macro,module,otherwise,quote,return,switch,true,try,type,typealias,%
+      using,while},%
+   sensitive=true,%
+   alsoother={$},%
+   morecomment=[l]\#,%
+   morecomment=[n]{\#=}{=\#},%
+   morestring=[s]{"}{"},%
+   morestring=[m]{'}{'},%
+}[keywords,comments,strings]%
+
+\lstset{%
+    language            = Julia,
+    frame               = lrtb,
+    numbers             = left,
+    basicstyle          = \ttfamily,
+    keywordstyle        = \bfseries\color{blue},
+    stringstyle         = \color{magenta},
+    commentstyle        = \color{codegreen},
+    showstringspaces    = false,
+    literate            ={Ω}{{$\Omega$}}1,
+}

@@ -7,8 +7,11 @@ O problema de RSD envolve restrições não lineares e variáveis quadráticas, 
     \label{eq:change_variable}
 \end{align}
 
-%Explicar o significado de conjunto de circuitos e conjunto de nós do sistema
+Onde $I_{ij}$ é a corrente entre os nós $i$ e $j$ e $\Omega_l$ é o conjunto de circuitos do sistema.
+O conjunto de circuitos corresponde a todos os ramos do sistema de distribuição com grandezas físicas correspondentes tais como impedância e corrente máxima, por exemplo.
 
+$V_i$ é a tensão no nó $i$ e $\Omega_b$ é o conjunto de nós do sistema.
+O conjunto de nós do sistema corresponde a todas as intersecções entre ramos do SDEE.
 
 \subsection{Função objetivo}
 
@@ -24,5 +27,3 @@ Definindo $c^{lss}$ como parâmetro que representa o custo das perdas de potênc
     \end{split}
     \label{eq:funcobjetivo}
 \end{equation}
-
-Tal que $\Omega_{l}$ é o conjunto de circuitos do sistema.

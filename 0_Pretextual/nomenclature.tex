@@ -1,0 +1,75 @@
+\makenomenclature
+\renewcommand{\nomname}{Lista de símbolos e nomenclaturas}
+\renewcommand\nomgroup[1]{%
+  \item[\bfseries
+  \ifstrequal{#1}{C}{Conjuntos}{%
+  \ifstrequal{#1}{V}{Variáveis}{%
+  \ifstrequal{#1}{P}{Parâmetros}{
+  \ifstrequal{#1}{A}{Abreviações}{}}}}%
+]}
+
+\nomenclature[A]{AMPL}{A Modeling Language for Mathematical Programming}
+\nomenclature[A]{ANEEL}{Agência nacional de energia elétrica}
+\nomenclature[A]{KNITRO}{Nonlinear Interior-point Trust Region Optimizer}
+\nomenclature[A]{SDEE}{Sistema de distribuição de energia elétrica}
+\nomenclature[A]{RSD}{Reconfiguração do sistema de distribuição}
+\nomenclature[A]{PL}{Programação Linear}
+\nomenclature[A]{PNL}{Programação não linear}
+\nomenclature[A]{PLIM}{Programação linear inteiro misto}
+\nomenclature[A]{PNLIM}{Programação não linear inteiro misto}
+\nomenclature[A]{PCSOIM}{Programação cônica de segunda ordem inteiro misto}
+\nomenclature[A]{Bonmin}{Basic Open-source Nonlinear Mixed INteger programming}
+
+\nomenclature[C]{$\Omega_b$}{Conjunto de nós do sistema}
+\nomenclature[C]{$\Omega_l$}{Conjunto de circuitos do sistema}
+\nomenclature[C]{$\Omega_{ch}$}{Conjunto de chaves do sistema}
+
+%\nomenclature[P]{$ $}{}
+\nomenclature[P]{$R_{ij}$}{Resistência entre o no nó i e o nó j}
+\nomenclature[P]{$X_{ij}$}{Reatância entre o nó i e o nó j}
+\nomenclature[P]{$Z_{ij}$}{Impedância entre o nó i e o nó j}
+\nomenclature[P]{$P_i^D$}{Demanda de potência ativa no nó i}
+\nomenclature[P]{$Q_i^D$}{Demanda de potência reativa no nó i}
+%\nomenclature[P]{$P_j^D$}{Demanda de potência ativa no nó j}
+%\nomenclature[P]{$Q_j^D$}{Demanda de potência reativa no nó j}
+%\nomenclature[P]{$P_k^D$}{Demanda de potência ativa no nó k}
+%\nomenclature[P]{$Q_k^D$}{Demanda de potência reativa no nó k}
+\nomenclature[P]{$P_i^S$}{Potência ativa fornecida pela subestação no nó i}
+\nomenclature[P]{$P_i^S$}{Potência reativa fornecida pela subestação no nó i}
+%\nomenclature[P]{$P_j^S$}{Potência ativa fornecida pela subestação no nó j}
+%\nomenclature[P]{$P_j^S$}{Potência reativa fornecida pela subestação no nó j}
+%\nomenclature[P]{$P_k^S$}{Potência ativa fornecida pela subestação no nó k}
+%\nomenclature[P]{$P_k^S$}{Potência reativa fornecida pela subestação no nó k}
+\nomenclature[P]{$\underline{V}$}{Limite mínimo de tensão permitido}
+\nomenclature[P]{$\overline{V}$}{Limite máximo de tensão permitido}
+\nomenclature[P]{$\overline{I}_{ij}$}{Limite máximo de fluxo de corrente entre os nós i e j}
+\nomenclature[P]{$\overline{I}_{ij}^{ch}$}{Fluxo de corrente máximo permitido na chave entre o nó i e o nó j}
+
+
+
+%\nomenclature[V]{$ $}{}
+\nomenclature[V]{$V_i$}{Magnitude da tensão no nó i}
+\nomenclature[V]{$V_j$}{Magnitude da tensão no nó j}
+\nomenclature[V]{$V_k$}{Magnitude da tensão no nó k}
+\nomenclature[V]{$\Vec{V}_i$}{Fasor tensão no nó i}
+\nomenclature[V]{$\Vec{V}_j$}{Fasor tensão no nó j}
+\nomenclature[V]{$\Vec{V}_k$}{Fasor tensão no nó k}
+\nomenclature[V]{$I_{ij}$}{Magnitude da corrente entre o nó i e o nó j}
+\nomenclature[V]{$I_{ki}$}{Magnitude da corrente entre o nó k e o nó i}
+\nomenclature[V]{$\vec{I}_{ij}$}{Fasor corrente entre o nó i e o nó j}
+\nomenclature[V]{$\vec{I}_{ki}$}{Fasor corrente entre o nó k e o nó i}
+\nomenclature[V]{$V_i^{sqr}$}{Variável que representa o quadrado da tensão $V_i$}  
+\nomenclature[V]{$V_j^{sqr}$}{Variável que representa o quadrado da tensão $V_j$}
+\nomenclature[V]{$V_k^{sqr}$}{Variável que representa o quadrado da tensão $V_k$}
+\nomenclature[V]{$P_{ij}$}{Fluxo de potência ativa entre o nó i e o nó j}
+%\nomenclature[V]{$P_{ki}$}{Fluxo de potência ativa entre o nó k e o nó i}
+%\nomenclature[V]{$P_{ji}$}{Fluxo de potência ativa entre o nó j e o nó i}
+\nomenclature[V]{$Q_{ji}$}{Fluxo de potência reativa entre o nó j e o nó i}
+%\nomenclature[V]{$Q_{ij}$}{Fluxo de potência reativa entre o nó i e o nó j}
+%\nomenclature[V]{$Q_{ki}$}{Fluxo de potência reativa entre o nó k e o nó i}
+\nomenclature[V]{$P_{ij}^{ch}$}{Fluxo de potência ativa na chave entre o nó i e o nó j}
+\nomenclature[V]{$Q_{ij}^{ch}$}{Fluxo de potência reativa na chave entre o nó i e o nó j}
+\nomenclature[V]{$w_{ij}$}{Variável binária que representa o estado da chave entre o nó i e o nó j}
+
+
+\printnomenclature

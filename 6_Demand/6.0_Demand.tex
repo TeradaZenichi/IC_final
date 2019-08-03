@@ -1,0 +1,116 @@
+\section{Múltiplos níveis de demanda}
+
+A formulação descrita na seção 5 é aplicável a problemas de demanda fixa.
+Algumas técnicas e estudos podem ser realizadas para demandas que variam ao logo do tempo.
+
+\subsection{Operação ideal das chaves para cada nível de demanda}
+
+Para uma rede de topologia radial com chaves interconectoras já distribuídas ao longo do sistema de distribuição, pode-se determinar a operação ideal das chaves para cada nível de demanda da rede de distribuição.
+Essa aplicação é interessante quando há um estudo da previsão de demanda para cada consumidor de modo que as chaves possam ser alternadas de modo a diminuir o fluxo de corrente para cada período de consumo.
+
+Para que se possam alterar as chaves de forma dinâmica é necessário que hajam chaves que possam suportar o arco elétrico e que estejam inseridas em um sistema robusto capaz de manter os níveis de tensões estáveis no momento da reconfiguração.
+
+\subsection{Formulação do problema de PLIM para minimização da demanda total}
+
+É possível modelar um problema de PLIM para múltiplos níveis de demanda.
+O modelo proposto na seção 5 pode ser ajustado para encontrar uma solução factível para todos os níveis de demanda com o objetivo de reduzir as perdas ôhmicas no SDEE.
+
+O conjunto de equações~\eqref{eq:demand_objec} a \eqref{eq:demand_currentlim} correspondem ao modelo de PLIM adequado para o problema de RSD aplicado a todos os níveis de demanda.
+
+\subsubsection{Função objetivo}
+A função a ser minimizada é definida pela soma do produto entre o número de horas de uma demanda pelo somatório de perdas para essa demanda.
+Define-se, então, o parâmetro $D_d$ que é o número de horas do nível de demanda do conjunto $\Omega_d$.
+
+O subíndice $d$ é aplicado a variável $I_{ij}^{sqr}$ de modo que se minimize as perdas ôhmicas para cada nível de demanda pertencente ao conjunto de demandas $\Omega_d$
+
+\begin{equation}\label{eq:demand_objec}
+    \text{Min}\quad cls\sum_{d\in\Omega_d}D_d\sum_{ij\in\Omega_l}R_{ij}I_{ij,d}^{sqr}\qquad\forall d\in\Omega_d
+\end{equation}
+
+\subsubsection{Balanço de potência}
+
+As equações de balanço de potência são definidas para cada nível de demanda $d\in\Omega_d$, assim, o balanço de potência ativa e reativa são expressas nas equações~\eqref{eq:demand_P} e \eqref{eq:demand_Q}.
+
+\begin{align}\label{eq:demand_P}
+    \sum_{ji\in\Omega_{l}}P_{ji,d} - \sum_{ij\in\Omega_{l}}(P_{ij,d} + R_{ij}I_{ij,d}^{sqr})+ \sum_{ji\in\Omega_{ch}}P_{ji,d}^{ch} -\sum_{ij\in\Omega_{ch}}P_{ij,d}^{ch} + P_{i,d}^{S} = P_{i,d}^{D}\quad\forall i \in\Omega_{b},\forall d\in\Omega_d\\
+    \label{eq:demand_Q}
+    \sum_{ji\in\Omega_{l}}Q_{ji,d} - \sum_{ij\in\Omega_{l}}(Q_{ij,d} + X_{ij}I_{ij,d}^{sqr})+ \sum_{ji\in\Omega_{ch}}Q_{ji,d}^{ch} -\sum_{ij\in\Omega_{ch}}Q_{ij,d}^{ch} + Q_{i,d}^{S} = P_{i,d}^{D}\quad\forall i \in\Omega_{b},\forall d\in\Omega_d
+\end{align}
+
+\subsubsection{Tensão entre barras}
+
+A tensão entre duas barras é determinada pela equação~\eqref{eq:demand_voltage} de modo que para cada nível de demanda 
+
+\begin{equation}\label{eq:demand_voltage}
+    V_{i,d}^{sqr} - 2(R_{ij}P_{ij,d} + X_{ij}Q_{ij,d}) - Z_{ij}^{2}I_{ij,d}^{2} - V_{j,d}^{sqr} = 0\quad\forall ij \in \Omega_{l},\forall d\in\Omega_d
+\end{equation}
+
+\subsubsection{Fluxo de potência}
+
+O fluxo de potência linearizado para vários níveis de demanda é mostrado através da equação~\eqref{eq:demand_power}
+
+\begin{equation}\label{eq:demand_power}
+    (V^{\text{nom}})^{2}I_{ij,d}^{sqr} = \sum_{r = 1}^{R}m_{ij,r}^{l}\Delta_{ij,r,d}^{Pl} + \sum_{r = 1}^{R}m_{ij,r}^{l}\Delta_{ij,r,d}^{Ql}\qquad\forall ij\in\Omega_l,\forall d\in\Omega_d
+\end{equation}
+
+É importante observar que as variáveis $\Delta_{ij,r,d}^{Pl}$ e $\Delta_{ij,r,d}^{Ql}$ são aplicadas a todos os níveis de demanda, já os parâmetros $m_{ij,r}^{l}$ e $\overline{\Delta}_{ij}^{l}$ são definidos únicos para todos os níveis.
+
+\begin{align}\label{eq:demand_deltamax}
+    &\overline{\Delta}_{ij}^{l} = \frac{V^{\text{nom}}\overline{I}_{ij}}{R} \qquad\qquad\qquad\forall ij\in\Omega_{l}\\
+    \label{eq:demand_coefangular}
+    &m_{ij,r}^{l} = (2r-1)\overline{\Delta_{ij}^{l}}\qquad\qquad\,\forall ij\in\Omega_{l} 
+\end{align}
+
+O conjunto de equações~\eqref{eq:demand_P} a ~\eqref{eq:demand_modQ} mostra a modelagem dos módulos das variáveis $P_{ij,d}$ e $Q_{ij,d}$ para o caso de minimização da demanda total.
+
+\begin{align}
+    &P_{ij,d} = P_{ij,d}^{+} - P_{ij,d}^{-}\quad\forall ij \in\Omega_{l},\forall d\in\Omega_d\label{eq:demand_Pmod}\\
+    &Q_{ij,d} = Q_{ij,d}^{+} - Q_{ij,d}^{-}\quad\forall ij \in\Omega_{l},\forall d\in\Omega_d\label{eq:demand_Qmod}\\
+    &P_{ij,d}^{+} + P_{ij,d}^{-} = \sum_{r = 1}^{R}\Delta_{ij,r,d}^{Pl}\quad\forall ij \in\Omega_{l},\forall d\in\Omega_d\label{eq:demand_modP}\\
+    &Q_{ij,d}^{+} + Q_{ij,d}^{-} = \sum_{r = 1}^{R}\Delta_{ij,r,d}^{Ql}\quad\forall ij \in\Omega_{l},\forall d\in\Omega_d\label{eq:demand_modQ}
+\end{align}
+
+As equações~\eqref{eq:demand_deltaP} e \eqref{eq:demand_deltaQ} mostram os limites dos blocos de discretização.
+É importante observar que o número de variáveis de discretização aumenta com o número de demandas, já os parâmetros que determinam os valores máximos dos blocos estão condicionados a equação~\eqref{eq:demand_deltamax} aplicável a todos os níveis de demanda.
+
+\begin{align}
+    0 \leq \Delta_{ij,r,d}^{Pl} \leq \overline{\Delta}_{ij,r}^l \qquad\forall ij\in\Omega_{l},d\in\Omega_d\label{eq:demand_deltaP}\\
+    0 \leq \Delta_{ij,r,d}^{Pl} \leq \overline{\Delta}_{ij,r}^l \qquad\forall ij\in\Omega_{l},d\in\Omega_d\label{eq:demand_deltaQ}
+\end{align}
+
+A equação~\eqref{eq:demand_mod}.
+
+\begin{equation}\label{eq:demand_mod}
+    P_{ij,d}^{+}\in\mathbb{R}^{+}, P_{ij,d}^{-}\in\mathbb{R}^{+}, Q_{ij,d}^{+}\in\mathbb{R}^{+}, Q_{ij,d}^{-}\in\mathbb{R}^{+}\qquad\forall ij\in\Omega_{l},\forall d\in\Omega_d
+\end{equation}
+
+\subsubsection{Modelagem das chaves}
+
+A modelagem das grandezas físicas na presença de chaves permanecem semelhantes à modeladas anteriormente, com a adição do subíndice $d$ às variáveis com exceção da variável de decisão $w_{ij}$, uma vez que o posicionamento das chaves são planejados para todos os perfis de demanda.
+
+\begin{gather}\label{eq:demand_voltagekeys}
+    -(\overline{V}^{2} - \underline{V}^{2})(1-w_{ij}) \leq V_{i,d}^{sqr} - V_{j,d}^{sqr} \leq (\overline{V}^{2} - \underline{V}^{2})(1-w_{ij})\qquad\forall ij\in\Omega_{ch},\forall d\in\Omega_d\\
+    \label{eq:demand_Pch}
+    -(\overline{V}\,\overline{I}_{ij}^{ch})w_{ij} \leq P_{ij,d}^{ch} \leq (\overline{V}\,\overline{I}_{ij}^{ch})w_{ij}\qquad\forall ij\in\Omega_{ch},\forall d\in\Omega_d\\
+    \label{eq:demand_Qch}
+    -(\overline{V}\,\overline{I}_{ij}^{ch})w_{ij} \leq Q_{ij,d}^{ch} \leq (\overline{V}\,\overline{I}_{ij}^{ch})w_{ij}\qquad\forall ij\in\Omega_{ch},\forall d\in\Omega_d
+\end{gather}
+
+\subsubsection{Restrição de radialidade}
+
+A restrição de radialidade mantém-se igual a formulada no problema de PLIM expressa pela equação \eqref{eq:radialidade} dado que a nova topologia deve ser única e aplicada a todos os níveis de demanda.
+
+\subsubsection{Restrições operativas}
+
+As restrições operativas determinam que, para todos os níveis de demanda, as tensões e correntes devem obedecer aos limites impostos como mostram as equações \eqref{eq:demand_voltagelim} e \eqref{eq:demand_currentlim}.
+
+\begin{align}\label{eq:demand_voltagelim}
+    \underline{V}^{2} \leq V_{i,d}^{sqr} \leq \overline{V}^{2}\qquad\forall i \in\Omega_{b},\forall d\in\Omega_d\\
+    \label{eq:demand_currentlim}
+    0 \leq I_{ij,d}^{sqr} \leq \overline{I}_{ij}^{2} \qquad\forall ij\in\Omega_{l},\forall d\in\Omega_d
+\end{align}
+
+
+
+
+

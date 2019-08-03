@@ -38,22 +38,23 @@ A reconfiguração do sistema de distribuição é um problema de otimização c
     \item PLIM: Programação linear inteiro misto
     
     \item PNLIM: Programação não linear inteiro misto
+    
+    \item PCSOIM: Programação cônica de segunda ordem inteiro misto
 \end{itemize}
 
-Para solucionar esses problemas utilizam-se de ``solvers'' que são programas cuja finalidade é encontrar uma solução ótima para um problema de programação.
+% Para solucionar esses problemas utilizam-se de ``solvers'' que são programas cuja finalidade é encontrar uma solução ótima para um problema de programação.
 
 Problemas de PL podem ser resolvidos usando algoritmos convencionais como simplex e pontos interiores.
 Já para problemas de PNL existem diversas técnicas como método de Newton e relaxação Lagrangeana.
-Problemas de PLIM podem ser resolvidos usando técnicas baseadas em branch and bound.
-Por fim um problema de PNLIM são complicados de serem solucionados e imagina-se que solvers comerciais usem algoritmos baseados em \emph{branch and bound}. 
+Problemas de PLIM podem ser resolvidos usando técnicas baseadas em \emph{branch and bound}.
+Problemas de PNLIM são complicados de serem solucionados e imagina-se que solvers comerciais usem algoritmos baseados em \emph{branch and bound}. 
+
 O problema de RSD, como será visto, é um problema não linear inteiro misto.
 Problemas não lineares são complicados de serem solucionados devido à dificuldade de convergência dos algoritmos usados para determinar soluções ótimas. 
 Além disso, em problemas de PL e PLIM existem condições necessárias e suficientes de otimização teoricamente provadas que garantem se uma dada solução é factível ou não.
 Já para problemas PNL e PNLIM não existem tais condições. Por outro lado existem as heurísticas e meta-heurísticas que buscam resolver esses problemas de forma a buscar uma solução satisfatória em tempo adequado \cite{Goncalves2013ModelosRadiais}.  
 
-
 Alguns trabalhos relevantes na literatura que abordam a reconfiguração de redes radiais com demandas fixas foram tratados em \cite{Baran1989NetworkBalancing} abordando algoritmos heurísticos.
-
 Algoritmos genéticos como mostrado em  \cite{Souza2015AlgoritmoVariaveis} se mostraram interessantes para resolver problemas de característica não linear.
 Em \cite{deCastro2002AnOptimization} mostra-se uma interessante abordagem que simula o comportamento do sistema imunológico do corpo humano para solucionar um problema de otimização não linear.
-Outra abordagem interessante é a transformação de um problema PNLIM em um problema PCSOIM (programação cônica de segunda ordem inteiro misto) através do relaxamento de uma restrição do problema \cite{Romais2014ReconfiguracaoMista}.
+Outra abordagem interessante é a transformação de um problema PNLIM em um problema PCSOIM (programação cônica de segunda ordem inteiro misto) através do relaxamento de uma restrição do problema como mostra \cite{Romais2014ReconfiguracaoMista}.

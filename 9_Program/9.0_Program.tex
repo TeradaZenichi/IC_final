@@ -1,0 +1,456 @@
+\section{Programação em Julia}
+
+Há diversas vantagens em utilizar-se uma linguagem de programação como a linguagem Julia.
+Uma dessas vantagens é o fato de ser gratuita, outra vantagem é a possibilidade de manipular o resultado obtendo gráficos como os que foram exibidos na seção de resultados.
+
+O programa desenvolvido recebe estruturas de dados denominadas \emph{Dataframes}, os quais são gerados pelo programa \verb|readnetwork.jl|.
+
+Os comandos a seguir são responsáveis por importar as bibliotecas necessárias e importar o arquivo responsável por gerar as estruturas de dados que serão usadas no problema.
+
+\begin{lstlisting}[language = Julia]
+using JuMP
+using CSV
+using DataFrames
+using GLPK
+using Blink
+using PlotlyJS
+
+#45nodes_multidemand.csv
+#45nodes_network.csv
+include("readnetwork.jl")
+using Main.readnetwork
+
+\end{lstlisting}
+
+A seguir, a sequência de códigos mostra  o método usado para gerar os valores máximos dos blocos de discretização do modelo linear, bem como a inclinação dos segmentos de reta que linearizam as funções quadráticas.
+
+\begin{lstlisting}[language = Julia,firstnumber=12]
+#Parameters for PLIM formulation
+mutable struct parameter
+    R::Int64
+    Vnom::Float64
+    Vmin::Float64
+    Vmax::Float64
+end
+plim  = parameter(50,param.Vnom[1],param.Vnom[1]*0.93,param.Vnom[1]*1.05)
+dSmax = zeros(length(Ωl.num));
+dSmax = plim.Vmax*Ωl.Imax/plim.R;
+mS    = zeros(length(Ωl.num),plim.R);
+for ol in eachrow(Ωl)
+    for r in 1:plim.R
+        mS[ol.num,r] = (2*r-1)*dSmax[ol.num]
+    end
+end
+\end{lstlisting}
+
+Comandos utilizados para definir um modelo usando o \emph{solver} \emph{GLPK} e definição das variáveis do problema de otimização.
+
+\begin{lstlisting}[language = Julia, firstnumber = 28]
+#Create a DSR optimization problem
+PLIM = Model(with_optimizer(GLPK.Optimizer));
+#Variables declaration
+@variable(PLIM, Vqdr[Ωb.i,Ωd.num] >= 0);
+@variable(PLIM, Iqdr[Ωl.num,Ωd.num] >= 0);
+@variable(PLIM, PS[Ωb.i,Ωd.num]);
+@variable(PLIM, QS[Ωb.i,Ωd.num]);
+@variable(PLIM, Pch[Ωch.num,Ωd.num]);
+@variable(PLIM, Qch[Ωch.num,Ωd.num]);
+@variable(PLIM, P[Ωl.num,Ωd.num]);
+@variable(PLIM, Q[Ωl.num,Ωd.num]);
+@variable(PLIM, Pp[Ωl.num,Ωd.num]>=0);
+@variable(PLIM, Pn[Ωl.num,Ωd.num]>=0);
+@variable(PLIM, Qp[Ωl.num,Ωd.num]>=0);
+@variable(PLIM, Qn[Ωl.num,Ωd.num]>=0);
+@variable(PLIM, dP[Ωl.num,1:plim.R,Ωd.num]>=0);
+@variable(PLIM, dQ[Ωl.num,1:plim.R,Ωd.num]>=0);
+@variable(PLIM, w[Ωch.num], Bin);
+\end{lstlisting}
+
+Definição da função objetivo para redução da demanda total e fixação da barra de geração com o valor máximo de tensão bem como fixando em zero a potência de geração para as barras não geradoras.
+
+\begin{lstlisting}[language = Julia, firstnumber = 46]
+#Objective Function
+@objective(PLIM, Min, cls * sum(od.T*sum(Iqdr[ol.num,od.num]*ol.R 
+           for ol in eachrow(Ωl)) for od in eachrow(Ωd)));
+
+#Define generator bar  
+for od in eachrow(Ωd)    
+    for ob in eachrow(Ωb)
+        if ob.Tb == 1
+            @constraint(PLIM, Vqdr[ob.i,od.num] == plim.Vmax^2);
+        else
+            @constraint(PLIM, PS[ob.i,od.num] == 0);
+            @constraint(PLIM, QS[ob.i,od.num] == 0);
+        end
+    end
+end
+\end{lstlisting}
+
+Restrição de balanço de potência para multiplas demandas.
+
+\begin{lstlisting}[language = Julia, firstnumber = 61]
+#Power balance
+for od in eachrow(Ωd)    
+    for ob in eachrow(Ωb)
+        @constraint(PLIM, sum(P[i,od.num] for i in lines[ob.i].in) 
+            - sum(P[i,od.num] + Ωl.R[i]*Iqdr[i,od.num] 
+            for i in lines[ob.i].out)
+            + sum(Pch[i,od.num] for i in key[ob.i].in)
+            - sum(Pch[i,od.num] for i in key[ob.i].out)
+            + PS[ob.i,od.num] == Ωb[!,od.P][ob.i])
+
+        @constraint(PLIM, sum(Q[i,od.num] for i in lines[ob.i].in) 
+            - sum(Q[i,od.num] + Ωl.X[i]*Iqdr[i,od.num] 
+            for i in lines[ob.i].out)
+            + sum(Qch[i,od.num] for i in key[ob.i].in)
+            - sum(Qch[i,od.num] for i in key[ob.i].out)
+            + QS[ob.i,od.num] == Ωb[!,od.Q][ob.i])
+    end
+end
+\end{lstlisting}
+
+Restrição de tensão entre duas barras, para diversos níveis de demanda.
+
+\begin{lstlisting}[language = Julia, firstnumber = 77]
+#Voltage between two bars
+for od in eachrow(Ωd)
+    for ol in eachrow(Ωl)
+        @constraint(PLIM, Vqdr[ol.i,od.num] - 2(ol.R*P[ol.num,od.num] 
+        + ol.X*Q[ol.num,od.num])- (ol.R^2 + ol.X^2)*Iqdr[ol.num,od.num]
+        - Vqdr[ol.j,od.num] == 0)
+    end
+end
+\end{lstlisting}
+
+Fluxo de potência entre barras aplicas à técnica de linearização.
+
+\begin{lstlisting}[language = Julia, firstnumber = 84]
+for od in eachrow(Ωd)    
+    for ol in eachrow(Ωl)
+        @constraint(PLIM,plim.Vmax^2*Iqdr[ol.num,od.num] == 
+            sum(dP[ol.num,r,od.num]*mS[ol.num,r] for r = 1:plim.R) 
+            + sum(dQ[ol.num,r,od.num]*mS[ol.num,r] for r = 1:plim.R)) 
+        @constraint(PLIM, Pp[ol.num,od.num] - Pn[ol.num,od.num] 
+            == P[ol.num,od.num])
+        @constraint(PLIM, Qp[ol.num,od.num] - Qn[ol.num,od.num] 
+            == Q[ol.num,od.num])
+        @constraint(PLIM, Pp[ol.num,od.num] + Pn[ol.num,od.num] 
+            == sum(dP[ol.num,r,od.num] for r =1:plim.R))
+        @constraint(PLIM, Qp[ol.num,od.num] + Qn[ol.num,od.num] 
+            == sum(dQ[ol.num,r,od.num] for r =1:plim.R))
+        for r=1:plim.R
+            @constraint(PLIM, dP[ol.num,r,od.num] <= dSmax[ol.num])
+            @constraint(PLIM, dQ[ol.num,r,od.num] <= dSmax[ol.num])
+        end
+    end
+end
+\end{lstlisting}
+
+Aplicação da modelagem das chaves nos sistemas de interconexão.
+
+\begin{lstlisting}[language = Julia, firstnumber = 103]
+#Keys constraints
+for od in eachrow(Ωd)    
+    for och in eachrow(Ωch)
+        @constraint(PLIM,  (plim.Vmin^2 - plim.Vmax^2)*(1-w[och.num]) 
+                    <= Vqdr[och.i,od.num] - Vqdr[och.j,od.num])
+        @constraint(PLIM,  Vqdr[och.i,od.num] - Vqdr[och.j,od.num] 
+                    <= (plim.Vmax^2 - plim.Vmin^2)*(1-w[och.num]))
+        @constraint(PLIM, -(plim.Vmax*och.Imaxch)*w[och.num] 
+                    <= Pch[och.num,od.num])
+        @constraint(PLIM, Pch[och.num,od.num] 
+                    <= (plim.Vmax*och.Imaxch)*w[och.num])
+        @constraint(PLIM, -(plim.Vmax*och.Imaxch)*w[och.num] 
+                    <= Qch[och.num,od.num])
+        @constraint(PLIM, Qch[och.num,od.num] 
+                    <= (plim.Vmax*och.Imaxch)*w[och.num])
+    end
+end
+\end{lstlisting}
+
+O bloco de códigos a seguir mostra a aplicação da restrição de radialidade, limites operativos e o comando para solucionar o problema com base nas modelagens jpa descritas.
+
+\begin{lstlisting}[language = Julia, firstnumber = 120]
+#Radial constraint
+@constraint(PLIM, size(Ωl,1) + sum(w[och.num] for och in eachrow(Ωch)) 
+            == size(Ωb,1) - sum(Ωb.Tb));
+#Voltage limits
+for od in eachrow(Ωd)
+    for ob in eachrow(Ωb)
+        @constraint(PLIM, Vqdr[ob.i,od.num] >= plim.Vmin^2)
+        @constraint(PLIM, Vqdr[ob.i,od.num] <= plim.Vmax^2)
+    end
+end
+#Current limits
+for od in eachrow(Ωd)
+    for ol in eachrow(Ωl)
+        @constraint(PLIM, Iqdr[ol.num,od.num] <= ol.Imax^2)
+    end
+end
+JuMP.optimize!(PLIM)
+\end{lstlisting}
+
+O conjunto de comandos a seguir corresponde a um conjunto de aplicações usadas para exibir gráficos e estrutura de dados com os resultados obtidos.
+
+\begin{lstlisting}[language = Julia, firstnumber = 137]
+data = GenericTrace[]
+for od in eachrow(Ωd)
+    #push!(data,scatter(;x=Ωb.i,y=Ωb[!,od.P],mode="lines+markers",
+            name=string("demand level number ", od.num)))
+    push!(data,bar(;x=Ωb.i,y=Ωb[!,od.P],
+            name=string("demand level number ", od.num)))
+end
+display(plot(data,Layout(title="Active power demand", 
+            xaxis_title="Bars", yaxis_title="Active power [kW]")))
+data = GenericTrace[]
+for od in eachrow(Ωd)
+    #push!(data,scatter(;x=Ωb.i,y=Ωb[!,od.Q],mode="lines+markers",
+            name=string("demand level number ", od.num)))
+    push!(data,bar(;x=Ωb.i,y=Ωb[!,od.Q],name=
+            string("demand level number ",od.num)))
+end
+display(plot(data,Layout(title="Reactive power demand", 
+            xaxis_title="Bars", yaxis_title="Reactive power [kVar]")))
+
+#Results
+obj_value_plim = JuMP.objective_value(PLIM);
+Vlim  = zeros(length(Ωb.i),length(Ωd.num));   
+Ilim  = zeros(length(Ωl.num),length(Ωd.num));
+PSlim = zeros(length(Ωb.i),length(Ωd.num));   
+QSlim = zeros(length(Ωb.i),length(Ωd.num));
+Plim  = zeros(length(Ωl.num),length(Ωd.num)); 
+Qlim  = zeros(length(Ωl.num),length(Ωd.num));
+Pchlim  = zeros(length(Ωch.num),length(Ωd.num)); 
+Qchlim  = zeros(length(Ωch.num),length(Ωd.num));
+
+for od in eachrow(Ωd)    
+    for ob in eachrow(Ωb)
+        Vlim[ob.i,od.num] = sqrt(JuMP.value(Vqdr[ob.i,od.num]))
+        PSlim[ob.i,od.num] = JuMP.value(PS[ob.i,od.num])
+        QSlim[ob.i,od.num] = JuMP.value(QS[ob.i,od.num])
+    end
+end
+loss_plim = Array{Float64,1}(undef,length(Ωd.num));
+for od in eachrow(Ωd)
+    demand_plim = 0;
+    for ol in eachrow(Ωl)
+        Ilim[ol.num,od.num] = sqrt(JuMP.value(Iqdr[ol.num,od.num]))
+        Plim[ol.num,od.num] = JuMP.value(P[ol.num,od.num])
+        Qlim[ol.num,od.num] = JuMP.value(Q[ol.num,od.num])
+        demand_plim = demand_plim + ol.R*Ilim[ol.num,od.num]^2
+    end
+    loss_plim[od.num] = demand_plim*od.T
+    for och in eachrow(Ωch)
+        Pchlim[och.num,od.num] = JuMP.value(Pch[och.num,od.num])
+        Qchlim[och.num,od.num] = JuMP.value(Qch[och.num,od.num])
+    end
+
+end
+wlim = Int64[];
+for och in eachrow(Ωch)
+    push!(wlim,JuMP.value(w[och.num]))
+end
+vmax_plot = scatter(;x=Ωb.i,y=ones(length(Ωb.i))*plim.Vmax,
+            name="Max voltage");
+vmin_plot = scatter(;x=Ωb.i,y=ones(length(Ωb.i))*plim.Vmin,
+            name="Min voltage");
+voltages = [vmax_plot,vmin_plot]
+for od in eachrow(Ωd)
+    data = scatter(;x=Ωb.i,y=Vlim[:,od.num[1]],name= 
+    string("bars voltage of demand number ", od.num),
+    mode="lines+markers")
+    push!(voltages,data)
+end
+display(plot(voltages,Layout(title="Network voltages for 
+        all demands after reconfiguration", xaxis_title = 
+        "Bars",yaxis_title = "Voltage [kV]")))
+\end{lstlisting}
+
+Aplicação da topologia inicial e módulos para exibição do resultado inicial e resultados gerais.
+
+\begin{lstlisting}[language = Julia, firstnumber = 208]
+#Create a DSR optimization problem
+Init = Model(with_optimizer(GLPK.Optimizer));
+#Variables declaration
+@variable(Init, Vqdr[Ωb.i,Ωd.num] >= 0);
+@variable(Init, Iqdr[Ωl.num,Ωd.num] >= 0);
+@variable(Init, PS[Ωb.i,Ωd.num]);
+@variable(Init, QS[Ωb.i,Ωd.num]);
+@variable(Init, Pch[Ωch.num,Ωd.num]);
+@variable(Init, Qch[Ωch.num,Ωd.num]);
+@variable(Init, P[Ωl.num,Ωd.num]);
+@variable(Init, Q[Ωl.num,Ωd.num]);
+@variable(Init, Pp[Ωl.num,Ωd.num]>=0);
+@variable(Init, Pn[Ωl.num,Ωd.num]>=0);
+@variable(Init, Qp[Ωl.num,Ωd.num]>=0);
+@variable(Init, Qn[Ωl.num,Ωd.num]>=0);
+@variable(Init, dP[Ωl.num,1:plim.R,Ωd.num]>=0);
+@variable(Init, dQ[Ωl.num,1:plim.R,Ωd.num]>=0);
+@variable(Init, w[Ωch.num], Bin);
+
+#Objective Function
+@objective(Init, Min, cls * sum(od.T*sum(Iqdr[ol.num,od.num]*ol.R 
+            for ol in eachrow(Ωl)) for od in eachrow(Ωd)));
+
+#Define generator bar  
+for od in eachrow(Ωd)    
+    for ob in eachrow(Ωb)
+        if ob.Tb == 1
+            @constraint(Init, Vqdr[ob.i,od.num] == plim.Vmax^2);
+        else
+            @constraint(Init, PS[ob.i,od.num] == 0);
+            @constraint(Init, QS[ob.i,od.num] == 0);
+        end
+    end
+end
+#Power balance
+for od in eachrow(Ωd)    
+    for ob in eachrow(Ωb)
+        @constraint(Init, sum(P[i,od.num] for i in lines[ob.i].in) 
+            - sum(P[i,od.num] + Ωl.R[i]*Iqdr[i,od.num] 
+            for i in lines[ob.i].out)
+            + sum(Pch[i,od.num] for i in key[ob.i].in)
+            - sum(Pch[i,od.num] for i in key[ob.i].out)
+            + PS[ob.i,od.num] == Ωb[!,od.P][ob.i])
+
+        @constraint(Init, sum(Q[i,od.num] for i in lines[ob.i].in) 
+            - sum(Q[i,od.num] + Ωl.X[i]*Iqdr[i,od.num] 
+            for i in lines[ob.i].out)
+            + sum(Qch[i,od.num] for i in key[ob.i].in)
+            - sum(Qch[i,od.num] for i in key[ob.i].out)
+            + QS[ob.i,od.num] == Ωb[!,od.Q][ob.i])
+    end
+end
+#Voltage between two bars
+for od in eachrow(Ωd)
+    for ol in eachrow(Ωl)
+        @constraint(Init, Vqdr[ol.i,od.num] - 2(ol.R*P[ol.num,od.num] 
+            + ol.X*Q[ol.num,od.num])- 
+            (ol.R^2 + ol.X^2)*Iqdr[ol.num,od.num] 
+            - Vqdr[ol.j,od.num] == 0)
+    end
+end
+#Piecewise linearization 
+for od in eachrow(Ωd)    
+    for ol in eachrow(Ωl)
+        @constraint(Init,plim.Vmax^2*Iqdr[ol.num,od.num] 
+            == sum(dP[ol.num,r,od.num]*mS[ol.num,r] for r = 1:plim.R) 
+            + sum(dQ[ol.num,r,od.num]*mS[ol.num,r] for r = 1:plim.R)) 
+        @constraint(Init, Pp[ol.num,od.num] - Pn[ol.num,od.num] 
+            == P[ol.num,od.num])
+        @constraint(Init, Qp[ol.num,od.num] - Qn[ol.num,od.num] 
+            == Q[ol.num,od.num])
+        @constraint(Init, Pp[ol.num,od.num] + Pn[ol.num,od.num] 
+            == sum(dP[ol.num,r,od.num] for r =1:plim.R))
+        @constraint(Init, Qp[ol.num,od.num] + Qn[ol.num,od.num] 
+            == sum(dQ[ol.num,r,od.num] for r =1:plim.R))
+        for r=1:plim.R
+            @constraint(Init, dP[ol.num,r,od.num] <= dSmax[ol.num])
+            @constraint(Init, dQ[ol.num,r,od.num] <= dSmax[ol.num])
+        end
+    end
+end
+#Keys constraints
+for od in eachrow(Ωd)    
+    for och in eachrow(Ωch)
+        if och.ei == 0
+            @constraint(Init, Pch[och.num,od.num] == 0)
+            @constraint(Init, Qch[och.num,od.num] == 0)
+        end
+        @constraint(Init,  Vqdr[och.j,od.num] - Vqdr[och.i,od.num] 
+            >= (-plim.Vmax^2)*(1-och.ei))
+        @constraint(Init,  Vqdr[och.i,od.num] - Vqdr[och.j,od.num] 
+            <= (plim.Vmax^2)*(1-och.ei))
+    end
+end
+JuMP.optimize!(Init)
+#Results
+obj_value = JuMP.objective_value(Init);
+Vinit  = zeros(length(Ωb.i),length(Ωd.num));   
+Iinit  = zeros(length(Ωl.num),length(Ωd.num));
+PSinit = zeros(length(Ωb.i),length(Ωd.num));   
+QSinit = zeros(length(Ωb.i),length(Ωd.num));
+Pinit  = zeros(length(Ωl.num),length(Ωd.num)); 
+Qinit  = zeros(length(Ωl.num),length(Ωd.num));
+Pchinit  = zeros(length(Ωch.num),length(Ωd.num)); 
+Qchinit  = zeros(length(Ωch.num),length(Ωd.num));
+
+for od in eachrow(Ωd)
+    for ob in eachrow(Ωb)
+        Vinit[ob.i,od.num] = sqrt(JuMP.value(Vqdr[ob.i,od.num]))
+        PSinit[ob.i,od.num] = JuMP.value(PS[ob.i,od.num])
+        QSinit[ob.i,od.num] = JuMP.value(QS[ob.i,od.num])
+    end
+end
+loss_init = Array{Float64,1}(undef,length(Ωd.num));
+for od in eachrow(Ωd)
+    demand_init = 0;
+    for ol in eachrow(Ωl)
+        Iinit[ol.num,od.num] = sqrt(abs(JuMP.value(Iqdr[ol.num,od.num])))
+        Pinit[ol.num,od.num] = JuMP.value(P[ol.num,od.num])
+        Qinit[ol.num,od.num] = JuMP.value(Q[ol.num,od.num])
+        demand_init = demand_init + ol.R*Iinit[ol.num,od.num]^2
+    end
+    loss_init[od.num] = demand_init*od.T
+    for och in eachrow(Ωch)
+        Pchinit[och.num,od.num] = JuMP.value(Pch[och.num,od.num])
+        Qchinit[och.num,od.num] = JuMP.value(Qch[och.num,od.num])
+    end
+    
+
+end
+vmax_plot = scatter(;x=Ωb.i,y=ones(length(Ωb.i))*plim.Vmax,
+    name="Max voltage");
+vmin_plot = scatter(;x=Ωb.i,y=ones(length(Ωb.i))*plim.Vmin,
+    name="Min voltage");
+voltages = [vmax_plot,vmin_plot]
+for od in eachrow(Ωd)
+    data = scatter(;x=Ωb.i,y=Vinit[:,od.num[1]],name=
+    string("bars voltage of demand number ", od.num),mode="lines+markers")
+    push!(voltages,data)
+end
+display(plot(voltages,Layout(title="Network voltages for 
+    all demands before reconfiguration",xaxis_title = 
+    "Bars",yaxis_title = "Voltage [kV]")))
+
+
+results = Array{DataFrame}(undef,length(Ωd.num))
+for od in eachrow(Ωd)
+    demand = DataFrame();
+    par = ["Active power Losses [kW]", "Minimum voltage magnitude [kV]", 
+        "Bar of minimum voltage magnitude",
+        "Substation active power [kW]", 
+        "Substation reactive power [kVar]"];
+    Initial = [string(round(loss_init[od.num], digits = 2 )), 
+        string(round(minimum(Vinit[:,od.num]),digits =2)),
+        string(argmin(Vinit[:,od.num])), 
+        string(round(maximum(PSinit[:,od.num]),digits=2)), 
+        string(round(maximum(QSinit[:,od.num])))  
+        ];
+    
+    Reconfigured = [string(round(loss_plim[od.num], digits = 2 )), 
+        string(round(minimum(Vlim[:,od.num]),digits =2)),
+        string(argmin(Vlim[:,od.num])), 
+        string(round(maximum(PSlim[:,od.num]),digits=2)), 
+        string(round(maximum(QSlim[:,od.num]),digits=2))  
+        ];
+    demand.Parameter = par;
+    demand.Initial = Initial;
+    demand.Reconfigured = Reconfigured;
+    results[od.num] = demand
+end
+
+print("Cost of losses per demand period before reconfiguration: 
+    US\$ ", round(JuMP.objective_value(Init),digits=2),"\n");
+print("Cost of losses per demand period after  reconfiguration: 
+    US\$ ", round(JuMP.objective_value(PLIM),digits=2),"\n\n");
+for od in eachrow(Ωd)
+    print("Demand number  ", od.num, " results:")
+    print(results[od.num],"\n\n");
+end
+
+keys_states = DataFrame();
+keys_states.Initial = Ωch.ei;
+keys_states.Reconfigured = wlim;
+print(keys_states);
+\end{lstlisting}

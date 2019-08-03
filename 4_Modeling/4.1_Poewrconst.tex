@@ -20,8 +20,7 @@ Seja $P_{i}^{D}$ e $Q_{i}^{D}$ potência ativa e reativa demandada no nó i resp
     \sum_{ki\in\Omega_{l}}Q_{ki} - \sum_{ij\in\Omega_{l}}(Q_{ij} + X_{ij}I_{ij}^{2}) + Q_{i}^{S} = Q_{i}^{D}\quad\forall i \in\Omega_{b}
 \end{equation*}
 
-Dado que $\Omega_{b}$ é o conjunto de nós do sistema.
-É possível mudar a variável \textit{k} pela variável \textit{j}, uma vez que ambas pertencem ao conjunto $\Omega_{l}$ e os somatórios envolvendo-as estão desconectados, além disso, pode-se realizar a troca de variável proposto em~\ref{eq:change_variable}, obtendo assim as equações~\ref{eq:fluxo_pot_ativa} e \ref{eq:fluxo_pot_reativa}.
+É possível mudar a variável \textit{k} pela variável \textit{j}, uma vez que ambas pertencem ao conjunto $\Omega_{l}$ e os somatórios envolvendo-as estão desconectados, além disso, pode-se realizar a troca de variável proposto em~\eqref{eq:change_variable}, obtendo assim as equações~\eqref{eq:fluxo_pot_ativa} e \eqref{eq:fluxo_pot_reativa}.
 \begin{equation}
     \sum_{ji\in\Omega_{l}}P_{ji} - \sum_{ij\in\Omega_{l}}(P_{ij} + R_{ij}I_{ij}^{sqr}) + P_{i}^{S} = P_{i}^{D}\quad\forall i \in\Omega_{b}\label{eq:fluxo_pot_ativa}  
 \end{equation}
@@ -30,4 +29,4 @@ Dado que $\Omega_{b}$ é o conjunto de nós do sistema.
     \sum_{ji\in\Omega_{l}}Q_{ji} - \sum_{ij\in\Omega_{l}}(Q_{ij} + X_{ij}I_{ij}^{sqr}) + Q_{i}^{S} = P_{i}^{D}\quad\forall i \in\Omega_{b}\label{eq:fluxo_pot_reativa}
 \end{equation}
 
-O sistema de equações não lineares em \ref{eq:fluxo_pot_ativa} e \ref{eq:fluxo_pot_reativa} representam a operação em regime permanente de uma rede elétrica radial e são frequentemente utilizados no método de varredura de fluxo de carga \cite{Shirmohammadi1988ANetworks} e \cite{Cespedes1990NewNetworks}.
+O sistema de equações não lineares em \eqref{eq:fluxo_pot_ativa} e \eqref{eq:fluxo_pot_reativa} representam a operação em regime permanente de uma rede elétrica radial e são frequentemente utilizados no método de varredura de fluxo de carga \cite{Shirmohammadi1988ANetworks} e \cite{Cespedes1990NewNetworks}.

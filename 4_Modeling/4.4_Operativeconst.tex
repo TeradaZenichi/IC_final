@@ -30,7 +30,7 @@ Considere as seguintes restrições:
 
 \begin{figure}[H]
     \centering
-    \includegraphics[scale = 1.5]{4_Modeling/diagrama_chaves.png}
+    \includegraphics[scale = 1.3]{4_Modeling/diagrama_chaves.png}
     \caption{Modelo de uma chave conectada entre dois nós}
     \label{fig:diagrama_chave}
 \end{figure}
@@ -38,7 +38,7 @@ Considere as seguintes restrições:
 \begin{itemize}
     \item Balanço de potência
 \end{itemize}
-    Com base na figura \ref{fig:diagrama_chave}, faz-se necessário reformular as equações de balanço de potência, expressas em~\ref{eq:fluxo_pot_ativa} e \ref{eq:fluxo_pot_reativa}, adicionando as variáveis que representam as chaves na modelagem do problema.
+    Com base na figura \eqref{fig:diagrama_chave}, faz-se necessário reformular as equações de balanço de potência, expressas em~\eqref{eq:fluxo_pot_ativa} e \eqref{eq:fluxo_pot_reativa}, adicionando as variáveis que representam as chaves na modelagem do problema.
 
 \begin{equation}
     \sum_{ji\in\Omega_{l}}P_{ji} - \sum_{ij\in\Omega_{l}}(P_{ij} + R_{ij}I_{ij}^{sqr})+ \sum_{ji\in\Omega_{ch}}P_{ji}^{ch} -\sum_{ij\in\Omega_{ch}}P_{ij}^{ch} + P_{i}^{S} = P_{i}^{D}\quad\forall i \in\Omega_{b}\label{eq:fluxo_pot_ativa_chaves}  
@@ -52,7 +52,7 @@ Considere as seguintes restrições:
     
 Onde $\Omega_{ch}$ representa o conjunto de chaves da rede elétrica e $w_{ij}$ é uma variável binária que representa o estado da chave \textit{ij}: se $w_{ij} = 1$ a chave ij está fechada, caso contrário a chave está aberta, ver figura~\ref{fig:diagrama_chave}. $P_{ij}^{ch}$ e $Q_{ij}^{ch}$ representam o fluxo de potência ativa e reativa da chave \textit{ij}.
 
-As restrições expressas nas equações \ref{eq:fluxo_pot_ativa_chaves} e \ref{eq:fluxo_pot_reativa_chaves} são uma extensão das equações \ref{eq:fluxo_pot_ativa} e \ref{eq:fluxo_pot_reativa}, considerando a presença de chaves na rede elétrica.
+As restrições expressas nas equações \eqref{eq:fluxo_pot_ativa_chaves} e \eqref{eq:fluxo_pot_reativa_chaves} são extensões das equações \eqref{eq:fluxo_pot_ativa} e \eqref{eq:fluxo_pot_reativa}, considerando a presença de chaves na rede elétrica.
     
 Além do balanço de potência, outras restrições devem ser estabelecidas devido à presença de chaves, são elas:
 
@@ -65,7 +65,7 @@ A diferença de tensão entre nós, na presença de chaves, deve ser igual a zer
 Sendo assim, usando a variável binária $w_{ij}$ é possível equacionar a restrição da seguinte forma:
 
 \begin{equation}
-    -(\overline{V}^{2} - \underline{V}^{2})(1-w_{ij}) \leq V_{i}^{sqr} - V_{j}^{sqr} \leq (\overline{V}^{2} - \underline{V}^{2})(1-w_{ij})\qquad\forall ij\in\Omega_{ch}        
+    -(\overline{V}^{2} - \underline{V}^{2})(1-w_{ij}) \leq V_{i}^{sqr} - V_{j}^{sqr} \leq (\overline{V}^{2} - \underline{V}^{2})(1-w_{ij})\qquad\forall ij\in\Omega_{ch}
 \end{equation}
     
 É possível observar que se $w_{ij}$ for igual a 1 (chave fechada), a diferença entre as tensões no nó $i$ e nó $j$ será igual a zero, o que condiz a hipótese adotada.
@@ -111,23 +111,23 @@ Assim, quando as restrições de balanço de potência são combinadas com a Con
 
 \begin{figure}[H]
     \centering
-    \includegraphics[scale = 1]{4_Modeling/restricao_fail.png}
-    \caption{Exemplo de rede não radial que obedece a equação \ref{eq:radialidade}}
+    \includegraphics[scale = 0.8]{4_Modeling/restricao_fail.png}
+    \caption{Exemplo de rede não radial que obedece a equação \eqref{eq:radialidade}}
     \label{fig:radialidade_wrong}
 \end{figure}
 
-Observa-se que a figura \ref{fig:radialidade_wrong}, embora respeite a equação \ref{eq:radialidade} (5 ramos para 6 nós), não é uma topologia radial. Isso pode acontecer se e somente se a equação~\ref{eq:radialidade} for levada em consideração.
+Observa-se que a figura \ref{fig:radialidade_wrong}, embora respeite a equação \eqref{eq:radialidade} (5 ramos para 6 nós), não é uma topologia radial. Isso pode acontecer se e somente se a equação~\eqref{eq:radialidade} for levada em consideração.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[scale=0.8]{4_Modeling/restricao_radialidade.png}
-    \caption{Exemplo de rede radial que obedece a equação \ref{eq:radialidade}}
+    \includegraphics[scale=0.6]{4_Modeling/restricao_radialidade.png}
+    \caption{Exemplo de rede radial que obedece a equação \eqref{eq:radialidade}}
     \label{fig:radialidade_right}
 \end{figure}
 
 Observe agora a figura \ref{fig:radialidade_right}, note que ela é uma topologia radial, como dito anteriormente é necessário duas condições para garantir tal configuração, como no problema já existem equações que garantem a primeira Lei de Kirchhoff, a topologia final será radial. 
-É possivel notar que todos os nós estão interligados, direto e não direto, com o nó 1 (nó da subestação).
+É possível notar que todos os nós estão interligados, direto e não direto, com o nó 1 (nó da subestação).
 Isso acontece pois as equações de balanço de potência obrigam que haja fluxo de potência para atender as demandas dos mesmos.
 
-Assim a equação \ref{eq:radialidade} junto com \ref{eq:fluxo_pot_ativa_chaves} e \ref{eq:fluxo_pot_reativa_chaves} fornecem as condições necessárias para e suficientes para garantir uma topologia final radial \cite{Lavorato2012ImposingProblems}.
+Assim a equação \eqref{eq:radialidade} junto com \eqref{eq:fluxo_pot_ativa_chaves} e \eqref{eq:fluxo_pot_reativa_chaves} fornecem as condições necessárias para e suficientes para garantir uma topologia final radial \cite{Lavorato2012ImposingProblems}.
 
